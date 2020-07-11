@@ -14,6 +14,6 @@ function getAWS() {
     $ca = aws_cpu::awsMRegGet(0   , ['cpu'], 1);
     $na = aws_cpu::awsMRegGet(1/24, ['net'], 1);    
 
-    return; // note that I'm not returning anything yet; I'll do so later.
+    return ['cpu' => $ca, 'net' => $na];
     
 }
