@@ -16,8 +16,12 @@ class aws_periodic_metrics {
 
 private static function getAWS() {
     $narr = $carr = [];
-    aws_cpu::cliGet('2020-06-21', '2020-06-24', 86400, 'net', $narr);
-    aws_cpu::cliGet('2020-06-21', '2020-06-24', 86400, 'cpu', $carr);
+    
+    $ca = aws_cpu::awsMRegGet(0   , ['cpu'], 1);
+    $na = aws_cpu::awsMRegGet(1/24, ['net'], 1);    
+    
+    // aws_cpu::cliGet('2020-06-21', '2020-06-24', 86400, 'net', $narr);
+    // aws_cpu::cliGet('2020-06-21', '2020-06-24', 86400, 'cpu', $carr);
     return;
 }
 
