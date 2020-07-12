@@ -11,18 +11,35 @@ require_once('testConditions.php');
 new sysStatus();
 
 class sysStatus {
+    
+    const delayAllowed = 300;
+    const duper        =  80;
+    // const cpu          = 1
 
 public function __construct() {
 
     $this->dao = new dao_sysstatus();
     if (!isSysTest('put')) $this->putSysStatus();
     $this->eval();
-
-    
 }
 
 private function eval() {
-    $res = $this->dao->get();
+    try {
+    $r = $this->dao->get();
+    $delayt = isSysTest('delay');
+    if ($delayt !== false) $delay = $delayt;
+    else                   $delay = self::delayAllowed;
+    
+    $d = time() - $r['ts'];
+    kwas ($d <= $delay, 'system check too old'); unset($d, $delay);
+
+    kwas($r['duper'] < self::duper, 'space is low');
+    // kwas($r['aws']['cpu'] 
+    
+    
+    } catch (Exception $ex) {
+	$x = 17;
+    }
     $x = 2;
     
     
