@@ -2,20 +2,22 @@
 
 require_once('/opt/kwynn/kwutils.php');
 
-class dao_sysevents extends dao_generic {
+class dao_sysstatus extends dao_generic {
     
-    const db = 'sysevents';
+    const db = 'sysstatus';
     
     public function __construct() {
 	parent::__construct(self::db);
-	$this->ecoll    = $this->client->selectCollection(self::db, 'events');
+	$this->scoll    = $this->client->selectCollection(self::db, 'status');
     }
     
     public function put($dat) {
 	$now = time();
 	$dat['ts'] = $now;
 	$dat['r']  = date('r', $now);
-	$this->ecoll->insertOne($dat);
+	$this->scoll->insertOne($dat);
 	
     }
+    
+    public function get() { return $this->scoll->findOne([], ['sort' => ['ts' => -1]]);   }
 }
