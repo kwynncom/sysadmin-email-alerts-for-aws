@@ -15,13 +15,69 @@ class sysStatus {
     const delayAllowed = 300;
     const duper        =  80;
     const gpm          =  10;
-    // const cpu          = 1
+    const cpud          = 1;
 
 public function __construct() {
 
     $this->dao = new dao_sysstatus();
     if (!isSysTest('put')) $this->putSysStatus();
-    $this->eval();
+    $r = $this->eval();
+    $this->actOnEval($r);
+    
+}
+
+private static function genBody($r, $a, $a2) {
+    $ht  = '';
+    $ht .= "<p><a href='$a' >clear these errs</a></p>\n";
+    $ht .= "<p><a href='$a2'>clear all errs</a></p>\n";
+    $ht .= '<pre>';
+    $ht .= $r;
+    $ht .= '</pre>';
+    
+    return $ht;
+    
+}
+
+private function actOnEval($e) {
+    
+    if ($e['stot'] === true) return;
+    
+    unset($e['stot'], $e['nete'], $e['cpue']);
+    
+    $d = $e;
+    $now = time();
+    $d['ts'] = $now;
+    $d['r']  = date('r', $now);
+    $d['email_status'] = 'pre';
+    $d['nonce'] = base62(6);
+    
+    $a  = self::getLink($now, $d['nonce']);
+    $a2 = self::getLink($now, $d['nonce'], 1);
+    
+    $this->dao->pute($d);
+    
+    $r = print_r($e, 1);
+    
+    $eo = new kwynn_email();
+    
+    $body = self::genBody($r, $a, $a2);
+    
+    $eo->smail($body, 'sys check fail', 1);
+    
+    $x = 2;
+}
+
+private static function getLink($q, $q2, $all = false) {
+    if (!isAWS()) $a  = 'http://sm20/upemail/server.php?ts='; 
+    // else 
+    
+    $a .= $q;
+    $a .= '&nonce=' . $q2;
+    if ($all) $a .= '&all=1';
+    
+    if (!isAWS()) $a .= '&XDEBUG_SESSION_START=netbeans-xdebug';
+    
+    return $a;
 }
 
 private static function evalDelay($r) {
@@ -43,6 +99,11 @@ private static function evalDelay($r) {
     $s['dnet' ] = $netd  <= $dAllow;
     $s['dcpu' ] = $cpud  <= $dAllow; unset($dAllow);
     
+    $stot = true;
+    foreach($s as $v) if ($v !== true) $stot = false; unset($v);
+    
+    unset($cpud, $netd, $thisd);
+    
     return get_defined_vars();
 }
 
@@ -60,20 +121,20 @@ private function eval() {
     $ubuup = $r['ubuup']; 
     $maxpos = $r['aws']['cpu']['max_possible_cpu']; unset($r);
         
-    $s['cpu'  ] = $cpu > $maxpos  - 1; unset($maxpos);
+    $s['cpu'  ] = $cpu > $maxpos  - self::cpud; unset($maxpos);
     $s['net'  ] = $net < self::gpm;
     $s['space'] = $du < self::duper;
     $s['ubuup'] = $ubuup === false;
-     
+    
+    $isaws = isAWS() ? 'Y' : 'N';
+
+    $ret = get_defined_vars();
+    
     } catch (Exception $ex) {
 	$x = 17;
     }
     
-    $ret = get_defined_vars();
-    
     return $ret;
-    
-    
 }
 
 private function putSysStatus() {
