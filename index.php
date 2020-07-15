@@ -14,6 +14,7 @@ class sysStatus {
     
     const delayAllowed = 300;
     const duper        =  80;
+    const gpm          =  10;
     // const cpu          = 1
 
 public function __construct() {
@@ -23,35 +24,65 @@ public function __construct() {
     $this->eval();
 }
 
+private static function evalDelay($r) {
+    $delayt = isSysTest('delay');
+    if ($delayt !== false) $dAllow = $delayt;
+    else                   $dAllow = self::delayAllowed; unset($delayt);   
+    
+    $now    = time();
+    $thisd = $now - $r['ts'];
+    
+    $nete  = $r['aws']['net']['end_exec_ts'];
+    $cpue  = $r['aws']['cpu']['end_exec_ts'];
+    $netd  = $now - $nete;
+    $cpud  = $now - $cpue;   unset($now, $r); 
+    
+    $s = [];
+        
+    $s['dthis'] = $thisd <= $dAllow; 
+    $s['dnet' ] = $netd  <= $dAllow;
+    $s['dcpu' ] = $cpud  <= $dAllow; unset($dAllow);
+    
+    return get_defined_vars();
+}
+
+
 private function eval() {
     try {
+    
     $r = $this->dao->get();
-    $delayt = isSysTest('delay');
-    if ($delayt !== false) $delay = $delayt;
-    else                   $delay = self::delayAllowed;
+    $edr = self::evalDelay($r);
+    extract($edr); unset($edr);
     
-    $d = time() - $r['ts'];
-    kwas ($d <= $delay, 'system check too old'); unset($d, $delay);
-
-    kwas($r['duper'] < self::duper, 'space is low');
-    // kwas($r['aws']['cpu'] 
-    
-    
+    $cpu = $r['aws']['cpu']['cpu'];
+    $net =  $r['aws']['net']['gpm'];
+    $du  = $r['duper'];
+    $ubuup = $r['ubuup']; 
+    $maxpos = $r['aws']['cpu']['max_possible_cpu']; unset($r);
+        
+    $s['cpu'  ] = $cpu > $maxpos  - 1; unset($maxpos);
+    $s['net'  ] = $net < self::gpm;
+    $s['space'] = $du < self::duper;
+    $s['ubuup'] = $ubuup === false;
+     
     } catch (Exception $ex) {
 	$x = 17;
     }
-    $x = 2;
+    
+    $ret = get_defined_vars();
+    
+    return $ret;
     
     
 }
 
 private function putSysStatus() {
-    $ubu = getUbuup();
+    $ubuup = getUbuup();
     $duper  = self::duper();
     $aws = getAWS();
     $mid = self::getMID();
-    $status = get_defined_vars(); unset($ubu, $du, $aws);
-    $this->dao->put($status); unset($status);
+    $status = get_defined_vars(); 
+    $this->dao->put($status);
     
 }
 
