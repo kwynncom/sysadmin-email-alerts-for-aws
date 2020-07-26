@@ -14,8 +14,8 @@ class sysStatus {
     
     const delayAllowed = 300;
     const duper        =  80;
-    const gpm          =  10;
-    const cpud          = 1;
+    const gpm          =   2;
+    const cpud          =  1;
 
 public function __construct() {
 
@@ -42,7 +42,7 @@ private function actOnEval($e) {
     
     if ($e['stot'] === true) return;
     
-    unset($e['stot'], $e['nete'], $e['cpue']);
+    unset($e['nete'], $e['cpue']);
     
     $d = $e;
     $now = time();
@@ -62,7 +62,10 @@ private function actOnEval($e) {
     
     $body = self::genBody($r, $a, $a2);
     
-    $eo->smail($body, 'sys check fail', 1);
+    $eres = $eo->smail($body, 'sys check fail', 1);
+    
+    $d['email_status'] = $eres;
+    $this->dao->pute($d);
     
     $x = 2;
 }
@@ -73,6 +76,7 @@ private static function getLink($q, $q2, $all = false) {
     
     $a .= $q;
     $a .= '&nonce=' . $q2;
+    // $a .= '&isaws=' . (isAWS() ? 'Y' : 'N');
     if ($all) $a .= '&all=1';
     
     if (!isAWS()) $a .= '&XDEBUG_SESSION_START=netbeans-xdebug';
@@ -98,9 +102,6 @@ private static function evalDelay($r) {
     $s['dthis'] = $thisd <= $dAllow; 
     $s['dnet' ] = $netd  <= $dAllow;
     $s['dcpu' ] = $cpud  <= $dAllow; unset($dAllow);
-    
-    $stot = true;
-    foreach($s as $v) if ($v !== true) $stot = false; unset($v);
     
     unset($cpud, $netd, $thisd);
     
@@ -128,6 +129,9 @@ private function eval() {
     
     $isaws = isAWS() ? 'Y' : 'N';
 
+    $stot = true;
+    foreach($s as $v) if ($v !== true) $stot = false; unset($v);
+    
     $ret = get_defined_vars();
     
     } catch (Exception $ex) {

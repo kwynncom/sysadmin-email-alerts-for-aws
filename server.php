@@ -1,6 +1,7 @@
 <?php
 
 require_once('/opt/kwynn/kwutils.php');
+require_once('dao.php');
 
 new upEmailClear();
 
@@ -13,7 +14,8 @@ class upEmailClear {
     }
 
 function clear($p) {
-    
+    $dao = new dao_sysstatus();
+    $dao->cput($p);
     
 }
     
@@ -33,6 +35,12 @@ function goodParamsOrDie() {
     $all = false;
     if (isset($_REQUEST['all']) 
 	&&    $_REQUEST['all'] === '1') $all = true;
+    
+    if (0) {
+	kwas(isset($_REQUEST['isaws']), 'no aws param goodPorDie upemail');
+	$isaws   = $_REQUEST['isaws'];
+	kwas($isaws === 'Y' || $isaws === 'N', 'bad aws value goodpord upemail');
+    }
     
     $ret = get_defined_vars();
     return $ret;
