@@ -1,12 +1,11 @@
 <?php
 
-function isSysTest($type) {
+function isUbuupEMTest($type) {
     
     if (isAWS()) return false;
-    
+ 
+    if ($type === 'levels') return 1;
     if ($type === 'put') return 1;
-    
-    if ($type === 'delay') return 3600;
     
     return false;
     

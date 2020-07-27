@@ -20,7 +20,7 @@ class dao_sysstatus extends dao_generic {
 	unset($q['all']);
 	$er = $this->ecoll->findOne($q);
 	if (!$er) return;
-	unset($dat['nonce']);
+	unset($er['nonce'], $dat['nonce'], $q['nonce']);
 	if (!$dat['all']) $dat['s'] = $er['s'];
 	$dat['tsem'] = $dat['ts']; unset($dat['ts']);
 	$now = time();
@@ -32,9 +32,8 @@ class dao_sysstatus extends dao_generic {
 	$this->ccoll->upsert($q, $dat);
 	if ($dat['all']) $this->ccoll->updateOne($q, ['$unset' => ['s' => 1]]);
 	return;
-	
     }
-    
+  
     public function put($dat) {
 	$now = time();
 	$dat['ts'] = $now;
@@ -47,6 +46,18 @@ class dao_sysstatus extends dao_generic {
     
     public function pute($dat) {
 	$this->ecoll->upsert(['ts' => $dat['ts']], $dat);
+    }
+    
+    public function checkClearance($sin) {
+	foreach($sin as $k => $v) if ($v === false) $qfs[] = $k;
+	
+	if (count($qfs) === 1) $q = ["s.$qfs[0]" => false];
+	else foreach($qfs as $f) $orq[] = ["s.$f" => false];
+	if (!isset($q)) $q['$or'] = $orq;
+	
+	
+	$res = $this->ecoll->findOne($q, ['sort' => ['ts' => -1]]);
+	return;
     }
     
 }

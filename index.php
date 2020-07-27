@@ -7,20 +7,19 @@ require_once('dao.php');
 require_once('ubuup.php');
 require_once('aws.php');
 require_once('testConditions.php');
+require_once('config.php');
+require_once('emailConditions.php');
 
 new sysStatus();
 
 class sysStatus {
-    
-    const delayAllowed = 300;
-    const duper        =  80;
-    const gpm          =   2;
-    const cpud          =  1;
+
+    const cpud         =   1;
 
 public function __construct() {
 
     $this->dao = new dao_sysstatus();
-    if (!isSysTest('put')) $this->putSysStatus();
+    if (!isUbuupEMTest('put')) $this->putSysStatus();
     $r = $this->eval();
     $this->actOnEval($r);
     
@@ -41,6 +40,9 @@ private static function genBody($r, $a, $a2) {
 private function actOnEval($e) {
     
     if ($e['stot'] === true) return;
+    
+    upemail_conditions::shouldSend($e['s'], $this->dao);
+    
     
     unset($e['nete'], $e['cpue']);
     
@@ -76,7 +78,6 @@ private static function getLink($q, $q2, $all = false) {
     
     $a .= $q;
     $a .= '&nonce=' . $q2;
-    // $a .= '&isaws=' . (isAWS() ? 'Y' : 'N');
     if ($all) $a .= '&all=1';
     
     if (!isAWS()) $a .= '&XDEBUG_SESSION_START=netbeans-xdebug';
@@ -85,9 +86,7 @@ private static function getLink($q, $q2, $all = false) {
 }
 
 private static function evalDelay($r) {
-    $delayt = isSysTest('delay');
-    if ($delayt !== false) $dAllow = $delayt;
-    else                   $dAllow = self::delayAllowed; unset($delayt);   
+    $dAllow = getAWSCPUAlertLevels('deall'); unset($delayt);   
     
     $now    = time();
     $thisd = $now - $r['ts'];
@@ -122,9 +121,9 @@ private function eval() {
     $ubuup = $r['ubuup']; 
     $maxpos = $r['aws']['cpu']['max_possible_cpu']; unset($r);
         
-    $s['cpu'  ] = $cpu > $maxpos  - self::cpud; unset($maxpos);
-    $s['net'  ] = $net < self::gpm;
-    $s['space'] = $du < self::duper;
+    $s['cpu'  ] = $cpu > $maxpos  - getAWSCPUAlertLevels('cpud'); unset($maxpos);
+    $s['net'  ] = $net < getAWSCPUAlertLevels('gpm');
+    $s['space'] = $du < getAWSCPUAlertLevels('duper');
     $s['ubuup'] = $ubuup === false;
     
     $isaws = isAWS() ? 'Y' : 'N';

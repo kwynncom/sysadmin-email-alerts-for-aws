@@ -17,6 +17,9 @@ function clear($p) {
     $dao = new dao_sysstatus();
     $dao->cput($p);
     
+    header('Content-Type: text/plain');
+    echo('OK - email reset');
+    
 }
     
 function goodParamsOrDie() {
