@@ -41,7 +41,7 @@ private function actOnEval($e) {
     
     if ($e['stot'] === true) return;
     
-    upemail_conditions::shouldSend($e['s'], $this->dao);
+    if (!upemail_conditions::shouldSend($e['s'], $this->dao)) return;
     
     
     unset($e['nete'], $e['cpue']);

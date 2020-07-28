@@ -48,16 +48,27 @@ class dao_sysstatus extends dao_generic {
 	$this->ecoll->upsert(['ts' => $dat['ts']], $dat);
     }
     
-    public function checkClearance($sin) {
+    public function emailAndClearanceHistory($sin) {
 	foreach($sin as $k => $v) if ($v === false) $qfs[] = $k;
 	
 	if (count($qfs) === 1) $q = ["s.$qfs[0]" => false];
 	else foreach($qfs as $f) $orq[] = ["s.$f" => false];
 	if (!isset($q)) $q['$or'] = $orq;
 	
+	$q2 = ['$and' => [$q, ['email_status' => true]] ];
 	
-	$res = $this->ecoll->findOne($q, ['sort' => ['ts' => -1]]);
-	return;
+	$per = $this->ecoll->findOne($q2, ['sort' => ['ts' => -1]]);
+	
+	if (!$per) return false;
+	
+	$q3['$or' ][] = ['all' => true];
+	$q3['$or' ][] = $q;
+	$q4['$and'][] = $q3;
+	$q4['$and'][] = ['tscl' => ['$gte' => $per['ts']]];
+	
+	$cr  = $this->ccoll->findOne($q4, ['sort' => ['tscl' => -1]]);
+	
+	return ['e' => $per, 'c' => $cr];
     }
     
 }
