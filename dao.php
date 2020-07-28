@@ -55,7 +55,8 @@ class dao_sysstatus extends dao_generic {
 	else foreach($qfs as $f) $orq[] = ["s.$f" => false];
 	if (!isset($q)) $q['$or'] = $orq;
 	
-	$q2 = ['$and' => [$q, ['email_status' => true]] ];
+	if (isUbuupEMTest('emst')) $q2 = $q;
+	else			   $q2 = ['$and' => [$q, ['email_status' => true]] ];
 	
 	$per = $this->ecoll->findOne($q2, ['sort' => ['ts' => -1]]);
 	

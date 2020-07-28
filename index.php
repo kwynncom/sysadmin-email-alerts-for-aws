@@ -69,7 +69,7 @@ private function actOnEval($e) {
     $d['email_status'] = $eres;
     $this->dao->pute($d);
     
-    $x = 2;
+    return;
 }
 
 private static function getLink($q, $q2, $all = false) {
