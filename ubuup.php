@@ -1,11 +1,6 @@
 <?php
-
-require_once(getUpPath('runBin.php'));
-
-function getUpPath($file) {
-    if (!isAWS()) return __DIR__ . '/../ubuup/' . $file;
-    
-}
+require_once('config.php');
+require_once(getUpPath());
 
 function getUbuup() {
     

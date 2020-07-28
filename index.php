@@ -73,7 +73,7 @@ private function actOnEval($e) {
 }
 
 private static function getLink($q, $q2, $all = false) {
-    if (!isAWS()) $a  = 'http://sm20/upemail/server.php?ts='; 
+    if (!isAWS()) $a = getUpEmailClearanceURLPrefix() . 'server.php?ts='; 
     // else 
     
     $a .= $q;

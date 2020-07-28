@@ -1,0 +1,4 @@
+update /opt/kwynn
+create / add cred for email
+add all paths
+create and run tests

@@ -1,12 +1,7 @@
 <?php
 
 require_once('/opt/kwynn/kwutils.php');
-
-require_once(getAWSPath());
-
-function getAWSPath() {
-    if (!isAWS()) return __DIR__ . '/..' . '/cpu/get/get.php';
-}
+require_once(getAWSCPUPath());
 
 function getAWS() { 
     $ca = $na = [];
@@ -15,5 +10,4 @@ function getAWS() {
     $na = aws_cpu::awsMRegGet(1/24, ['net'], 1, 1);
 
     return ['cpu' => $ca, 'net' => $na];
-    
 }
