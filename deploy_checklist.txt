@@ -1,4 +1,5 @@
-update /opt/kwynn
-create / add cred for email
+update aws cpu
+update ubuup
+****
 add all paths
 create and run tests
