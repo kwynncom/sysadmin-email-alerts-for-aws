@@ -1,19 +1,68 @@
-<?php
+<?php // see output check at bottom
 
-function ueo($msg, $type = false) {
-    if (!iscli()) return;
+require_once('/opt/kwynn/kwutils.php');
+require_once('/opt/kwynn/isKwGoo.php');
+require_once('dao.php');
+
+class upemail_output extends dao_generic {
     
-    if ($type === 'emailRes') {
-	if ($msg === true)   return ueo2('email sent');
-	if ($msg === false)  return ueo2('email failed');
-	if (is_string($msg)) return ueo2('email result: ' . $msg);
-	return ueo2('unknown emailRes type to ueo()');
+    const db = dao_sysstatus::db;
+    
+    public static function out($msg, $type = false) {
+	if (!iscli()) return;
+
+	if ($type === 'emailRes') {
+	    if ($msg === true)   return self::outi('email sent');
+	    if ($msg === false)  return self::outi('email failed');
+	    if (is_string($msg)) return self::outi('email result: ' . $msg);
+	    return self::outi('unknown emailRes type to ueo()');
+	}
+
+	return self::outi($msg);	
     }
     
-    return ueo2($msg);
+    private static function outi($msg) {
+	    static $o = false;
+	    echo $msg . "\n";    
+	    if (!$o) $o = new self();
+	    $o->put($msg);	
+    }
     
+    private function put($msg) {
+	$d['u' ] = microtime(1);
+	$d['n' ] = hrtime(1);
+	$d['ts'] = intval(floor($d['u']));
+	$d['m' ] = $msg;
+	$this->ocoll->insertOne($d);
+    }
+    
+    private function __construct() {
+	parent::__construct(self::db);
+	$this->ocoll    = $this->client->selectCollection(self::db, 'out');
+    }
+    
+    public static function accessCheck() {
+	if (isKwGoo() || isKwDev()) { self::allOutput(); exit(0); }
+	$m = 'The following should be overwhelming evidence of Russian collusion: "Nyet!"';
+	http_response_code(401);
+	die($m);
+    }
+    
+    public static function allOutput() {
+	$o = new self();
+	$a = $o->ocoll->find([], ['sort' => ['n' => -1], 'limit' => 50])->toArray();
+	
+	header('Content-Type: text/plain');
+	
+	foreach($a as $r) {
+	    $d = date( 'h:i A D m/d' , $r['ts']);
+	    echo $d . ': ' . $r['m'] . "\n";
+	}
+	
+	if (!$a) echo 'no data';
+    }
 }
 
-function ueo2($msg) {
-    echo $msg . "\n";    
-}
+function ueo($msg, $type = false) { upemail_output::out($msg, $type); }
+
+if (!iscli()) upemail_output::accessCheck();
