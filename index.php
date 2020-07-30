@@ -8,3 +8,5 @@ if (iscli()) {
 }
 
 require_once('out.php');
+
+exit(0);
