@@ -12,6 +12,14 @@ https://github.com/kwynncom/ubuntu-update-web-checker
 https://github.com/kwynncom/kwynn-php-general-utils/blob/master/email.php
 
 ***********
+07/29 7:39pm
+
+2 more deploy entries:
+
+update aws cpu
+update ubuup
+
+
 2020/07/28 7:49pm - deploy checklist:
 
 update /opt/kwynn

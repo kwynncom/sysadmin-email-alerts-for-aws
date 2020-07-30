@@ -2,6 +2,7 @@
 
 require_once('/opt/kwynn/kwcod.php');
 require_once('/opt/kwynn/kwutils.php');
+require_once('out.php');
 require_once('/opt/kwynn/email.php');
 require_once('dao.php');
 require_once('ubuup.php');
@@ -22,7 +23,6 @@ public function __construct() {
     if (!isUbuupEMTest('put')) $this->putSysStatus();
     $r = $this->eval();
     $this->actOnEval($r);
-    
 }
 
 private static function genBody($r, $a, $a2) {
@@ -39,9 +39,17 @@ private static function genBody($r, $a, $a2) {
 
 private function actOnEval($e) {
     
-    if ($e['stot'] === true) return;
+    if ($e['stot'] === true) {
+	ueo('OK - all tests passed');
+	return;
+    }
     
-    if (!upemail_conditions::shouldSend($e['s'], $this->dao)) return;
+    ueo('1+ tests failed');
+    
+    if (!upemail_conditions::shouldSend($e['s'], $this->dao)) {
+	ueo('no emails will be sent due to conditions');
+	return;
+    }
     
     
     unset($e['nete'], $e['cpue']);
@@ -65,6 +73,8 @@ private function actOnEval($e) {
     $body = self::genBody($r, $a, $a2);
     
     $eres = $eo->smail($body, 'sys check fail', 1);
+    
+    ueo($eres, 'emailRes');
     
     $d['email_status'] = $eres;
     $this->dao->pute($d);
