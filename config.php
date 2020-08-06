@@ -8,7 +8,7 @@ function getAWSCPUAlertLevels($kin) {
     $ls = [ 
 	    'deall'    => ['live' => 300, 'test' =>  300],
 	    'duper'    => ['live' =>  80, 'test' =>   10],
-	    'gpm'      => ['live' =>   2, 'test' =>   -1],
+	    'gpm'      => ['live' =>   4, 'test' =>   -1],
 	    'cpud'     => ['live' =>   1, 'test' =>   -1]
 	];
     
