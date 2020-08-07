@@ -1,6 +1,17 @@
 # sysadmin-email-alerts-for-aws
 Email alerts for disk usage, AWS EC2 CPU balance, and Ubuntu updates
 
+**************
+2020/08/07 7:27pm EDT / GMT -4
+
+This has been running on a cron job and emailing for about a week.  Everything seems to work.  
+
+This also checks for outgoing network traffic.  The emails were being trigged too often for this.  I am getting 
+usage over 30 minutes that equated to 40 GB / month.  I just set the trigger limit to 50.  That would be $4.50 if it 
+continued all month.  See "Data Transfer" charges: https://aws.amazon.com/ec2/pricing/on-demand/
+
+
+**********
 I am just starting, but the very basics work.  I'm not emailing yet, but I'm gathering the data.
 
 This uses / will use 3 previous projects / files:
