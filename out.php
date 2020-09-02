@@ -29,9 +29,9 @@ class upemail_output extends dao_generic {
     }
     
     private function put($msg) {
-	$d['u' ] = microtime(1);
-	$d['n' ] = hrtime(1);
-	$d['ts'] = intval(floor($d['u']));
+	$now = time();
+	$d['ts'] = $now;
+	$d['r' ] = date('r', $now);
 	$d['m' ] = $msg;
 	$this->ocoll->insertOne($d);
     }
@@ -50,7 +50,7 @@ class upemail_output extends dao_generic {
     
     public static function allOutput() {
 	$o = new self();
-	$a = $o->ocoll->find([], ['sort' => ['n' => -1], 'limit' => 50])->toArray();
+	$a = $o->ocoll->find([], ['sort' => ['ts' => -1], 'limit' => 50])->toArray();
 	
 	header('Content-Type: text/plain');
 	

@@ -1,6 +1,17 @@
 # sysadmin-email-alerts-for-aws
 Email alerts for disk usage, AWS EC2 CPU balance, and Ubuntu updates
 
+2020
+
+09 (September) - all times are EDT / GMT -4 / Atlanta / New York
+
+02
+
+1:20am
+
+I have not been clear until now whether hrtime() is monotonic forever or only for a given boot session.  It would appear to be the latter.  That is, 
+if you reboot your machine, you can no longer use hrtime(1) output to sort by.  
+
 **************
 2020/08/07 7:27pm EDT / GMT -4
 
