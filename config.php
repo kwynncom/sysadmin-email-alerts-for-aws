@@ -9,7 +9,7 @@ function getAWSCPUAlertLevels($kin) {
 	    'deall'    => ['live' => 300, 'test' =>  300],
 	    'duper'    => ['live' =>  80, 'test' =>   10],
 	    'gpm'      => ['live' =>  50, 'test' =>   -1],
-	    'cpud'     => ['live' =>   3, 'test' =>   -1]
+	    'cpud'     => ['live' =>   5, 'test' =>   -1]
 	];
     
     if (isUbuupEMTest('levels')) $k1 = 'test';
