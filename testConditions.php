@@ -1,8 +1,10 @@
 <?php
 
 function isUbuupEMTest($type) {
+	
+	return false; // *****
     
-    if (isAWS()) return false;
+    // if (is   *** AWS()) return false;
  
     // return 1;
     

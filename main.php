@@ -90,7 +90,7 @@ private static function getLink($q, $q2, $all = false) {
     $a .= '&nonce=' . $q2;
     if ($all) $a .= '&all=1';
     
-    if (!isAWS()) $a .= '&XDEBUG_SESSION_START=netbeans-xdebug';
+    // $a .= '&XDEBUG_SESSION_START=netbeans-xdebug';
     
     return $a;
 }
@@ -135,8 +135,6 @@ private function eval() {
     $s['net'  ] = $net < getAWSCPUAlertLevels('gpm');
     $s['space'] = $du < getAWSCPUAlertLevels('duper');
     $s['ubuup'] = $ubuup === false;
-    
-    $isaws = isAWS() ? 'Y' : 'N';
 
     $stot = true;
     foreach($s as $v) if ($v !== true) $stot = false; unset($v);
@@ -154,16 +152,10 @@ private function putSysStatus() {
     $ubuup = getUbuup();
     $duper  = self::duper();
     $aws = getAWS();
-    $mid = self::getMID();
+    // $mid = self::getMID();
     $status = get_defined_vars(); 
     $this->dao->put($status);
     
-}
-
-private static function getMID() {
-    if (isAWS())  return 'aws';
-    if (ispkwd()) return 'precisely-kwynn-dev';
-    return               'not-aws';
 }
 
 public static function duper() {

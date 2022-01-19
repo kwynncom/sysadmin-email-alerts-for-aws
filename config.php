@@ -19,14 +19,14 @@ function getAWSCPUAlertLevels($kin) {
 }
 
 function getUpEmailClearanceURLPrefix() {
-    if (!isAWS()) return kwynn_creds::get('upemail_url_doc_root', 'url');
+    // if (**not AWS***) return kwynn_creds::get('upemail_url_doc_root', 'url');
     return 'https://kwynn.com/t/20/07/upemail/';
 }
 
 function getUpPath() {
     static $sfx = '/ubuup/runBin.php';
     $p = __DIR__ . '/..';
-    if (isAWS()) $p .= '/../05';
+    $p .= '/../05';
     $p.= $sfx;
     return $p;
 }
@@ -34,7 +34,7 @@ function getUpPath() {
 function getAWSCPUPath() {
     static $sfx = '/cpu/get/get.php';
     $p = __DIR__ . '/..';
-    if (isAWS()) $p .= '/../../9/10';
+    $p .= '/../../9/10';
     $p .= $sfx;
     return $p;
 }
