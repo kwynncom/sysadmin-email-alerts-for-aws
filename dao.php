@@ -28,7 +28,7 @@ class dao_sysstatus extends dao_generic {
 	$dat['rcl' ] = date('r', $now);
 	$dat['ip']   = $_SERVER['REMOTE_ADDR'];
 	$dat['ua']   = $_SERVER['HTTP_USER_AGENT'];
-	$dat['isaws'] = $er['isaws'];
+	// $dat['isaws'] = $er['isaws'];
 	$this->ccoll->upsert($q, $dat);
 	if ($dat['all']) $this->ccoll->updateOne($q, ['$unset' => ['s' => 1]]);
 	return;
