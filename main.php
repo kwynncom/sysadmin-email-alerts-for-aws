@@ -137,6 +137,7 @@ private function eval() {
     $du  = $r['duper'];
     $ubuup = $r['ubuup']; 
     if (!$isk) $maxpos = $r['aws']['cpu']['max_possible_cpu']; 
+	$timepass = $r['timeo']['pass'];
 	unset($r);
      
 	if (!$isk) {
@@ -146,6 +147,7 @@ private function eval() {
 	
     $s['space'] = $du < getAWSCPUAlertLevels('duper');
     $s['ubuup'] = $ubuup === false;
+	$s['time' ] = $timepass;
 
     $stot = true;
     foreach($s as $v) if ($v !== true) $stot = false; unset($v);
@@ -163,7 +165,7 @@ private function putSysStatus() {
     $ubuup = getUbuup();
     $duper  = self::duper();
     $aws = getAWS();
-	// $timeo = 
+	$timeo = nist_passfail::getDets();
 	
     $status = get_defined_vars(); 
     $this->dao->put($status);
