@@ -143,11 +143,11 @@ private function eval() {
 	if (!$isk) {
 		$s['cpu'  ] = $cpu > $maxpos  - getAWSCPUAlertLevels('cpud'); unset($maxpos);
 		$s['net'  ] = $net < getAWSCPUAlertLevels('gpm');
-	}
+	} unset($isk);
 	
     $s['space'] = $du < getAWSCPUAlertLevels('duper');
     $s['ubuup'] = $ubuup === false;
-	$s['time' ] = $timepass;
+	$s['timepass' ] = $timepass;
 
     $stot = true;
     foreach($s as $v) if ($v !== true) $stot = false; unset($v);
