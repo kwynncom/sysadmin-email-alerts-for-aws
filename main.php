@@ -10,6 +10,7 @@ require_once('aws.php');
 require_once('testConditions.php');
 require_once('config.php');
 require_once('emailConditions.php');
+require_once(__DIR__ . '/../../../21/10/chm/nist/passfail.php'); // https://github.com/kwynncom/chrony-measurements
 
 new sysStatus();
 
@@ -121,18 +122,28 @@ private static function evalDelay($r) {
 private function eval() {
     try {
     
+		$isk = ispkwd();
+		
     $r = $this->dao->get();
-    $edr = self::evalDelay($r);
-    extract($edr); unset($edr);
+	
+	if (!$isk) {
+		$edr = self::evalDelay($r);
+		extract($edr); unset($edr);
     
-    $cpu = $r['aws']['cpu']['cpu'];
-    $net =  $r['aws']['net']['gpm'];
+		$cpu = $r['aws']['cpu']['cpu'];
+		$net =  $r['aws']['net']['gpm'];
+	}
+	
     $du  = $r['duper'];
     $ubuup = $r['ubuup']; 
-    $maxpos = $r['aws']['cpu']['max_possible_cpu']; unset($r);
-        
-    $s['cpu'  ] = $cpu > $maxpos  - getAWSCPUAlertLevels('cpud'); unset($maxpos);
-    $s['net'  ] = $net < getAWSCPUAlertLevels('gpm');
+    if (!$isk) $maxpos = $r['aws']['cpu']['max_possible_cpu']; 
+	unset($r);
+     
+	if (!$isk) {
+		$s['cpu'  ] = $cpu > $maxpos  - getAWSCPUAlertLevels('cpud'); unset($maxpos);
+		$s['net'  ] = $net < getAWSCPUAlertLevels('gpm');
+	}
+	
     $s['space'] = $du < getAWSCPUAlertLevels('duper');
     $s['ubuup'] = $ubuup === false;
 
@@ -152,7 +163,8 @@ private function putSysStatus() {
     $ubuup = getUbuup();
     $duper  = self::duper();
     $aws = getAWS();
-    // $mid = self::getMID();
+	// $timeo = 
+	
     $status = get_defined_vars(); 
     $this->dao->put($status);
     

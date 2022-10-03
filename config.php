@@ -7,7 +7,7 @@ require_once('testConditions.php');
 function getAWSCPUAlertLevels($kin) {
     $ls = [ 
 	    'deall'    => ['live' => 300, 'test' =>  300],
-	    'duper'    => ['live' =>  80, 'test' =>   10],
+	    'duper'    => ['live' =>  84, 'test' =>   10],
 	    'gpm'      => ['live' =>  50, 'test' =>   -1],
 	    'cpud'     => ['live' =>   5, 'test' =>   -1]
 	];
