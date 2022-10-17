@@ -20,10 +20,16 @@ class sysStatus {
 
 public function __construct() {
 
-    $this->dao = new dao_sysstatus();
-    if (!isUbuupEMTest('put')) $this->putSysStatus();
-    $r = $this->eval();
-    $this->actOnEval($r);
+	restore_error_handler();
+	
+	try {
+		$this->dao = new dao_sysstatus();
+		if (!isUbuupEMTest('put')) $this->putSysStatus();
+		$r = $this->eval();
+		$this->actOnEval($r);
+	} catch (Exception $ex) {	}
+	
+	$this->email();
 }
 
 private static function genBody($r, $a, $a2) {
@@ -48,8 +54,9 @@ private function actOnEval($e) {
     ueo('1+ tests failed');
     
     if (!upemail_conditions::shouldSend($e['s'], $this->dao)) {
-	ueo('no emails will be sent due to conditions');
-	return;
+		$this->noemailcond = true;
+		ueo('no emails will be sent due to conditions');
+		return;
     }
     
     
@@ -68,19 +75,27 @@ private function actOnEval($e) {
     $this->dao->pute($d);
     
     $r = print_r($e, 1);
+  
     
+    $this->embody = self::genBody($r, $a, $a2);
+	$this->emdov = $d;
+}
+
+private function email() {
+	$body = 'exception';
+	
+	if (isset($this->noemailcond)) return;
+	
+	$bck = kwifs($this, 'embody');
+	if ($bck && is_string($bck)) $body = $bck;
+	
     $eo = new kwynn_email();
-    
-    $body = self::genBody($r, $a, $a2);
-    
-    $eres = $eo->smail($body, 'sys check fail', 1);
-    
-    ueo($eres, 'emailRes');
-    
-    $d['email_status'] = $eres;
+    $eres = $eo->smail($body, 'sys check fail', 1);	
+	ueo($eres, 'emailRes');
+	
+	$d = $this->emdov;
+	$d['email_status'] = $eres;
     $this->dao->pute($d);
-    
-    return;
 }
 
 private static function getLink($q, $q2, $all = false) {
@@ -165,7 +180,7 @@ private function putSysStatus() {
     $ubuup = getUbuup();
     $duper  = self::duper();
     $aws = getAWS();
-	$timeo = nist_passfail::getDets();
+	try { $timeo = nist_passfail::getDets(); } catch(Exception $ex) { }
 	
     $status = get_defined_vars(); 
     $this->dao->put($status);
