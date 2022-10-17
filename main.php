@@ -48,6 +48,7 @@ private function actOnEval($e) {
     
     if ($e['stot'] === true) {
 	ueo('OK - all tests passed');
+	$this->emAllPass = true;
 	return;
     }
     
@@ -82,10 +83,11 @@ private function actOnEval($e) {
 }
 
 private function email() {
-	$body = 'exception';
-	
+
+	if (isset($this->emAllPass))   return;
 	if (isset($this->noemailcond)) return;
 	
+	$body = 'exception';
 	$bck = kwifs($this, 'embody');
 	if ($bck && is_string($bck)) $body = $bck;
 	
