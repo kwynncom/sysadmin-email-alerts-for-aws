@@ -41,28 +41,47 @@ class upemail_output extends dao_generic {
 	$this->ocoll    = $this->client->selectCollection(self::db, 'out');
     }
     
-    public static function accessCheck() {
-	if (isKwGoo() || isKwDev()) { self::allOutput(); exit(0); }
-	$m = 'The following should be overwhelming evidence of Russian collusion: "Nyet!"';
-	http_response_code(401);
-	die($m);
+    public static function doit() { // therefore - this is actually the output
+		
+		$isac = isKwGoo(); // || isKwDev();
+		$t  = '';
+		ob_start();
+		require_once(__DIR__ . '/template10.html');
+		if (!$isac) { $t .= <<<UPENOACC
+			<p>
+			The following should be overwhelming evidence of Russian collusion: "Nyet!"
+			</p>
+UPENOACC;
+		}
+		else {
+			$t .= ob_get_clean();
+			$t .= '<pre>'. "\n";
+			ob_start();
+			self::allOutput();
+			$t .= ob_get_clean();
+			$t .= "</pre>\n</body>\n</html>\n". "\n";
+		}
+		
+		echo($t);
+		exit(0);
     }
     
-    public static function allOutput() {
-	$o = new self();
-	$a = $o->ocoll->find([], ['sort' => ['ts' => -1], 'limit' => 50])->toArray();
-	
-	header('Content-Type: text/plain');
-	
-	foreach($a as $r) {
-	    $d = date( 'h:i A D m/d' , $r['ts']);
-	    echo $d . ': ' . $r['m'] . "\n";
-	}
-	
-	if (!$a) echo 'no data';
+	/* reasonably sure this isn't used externally, so can be private -- Kwynn 2023/08	 */
+    private static function allOutput() { 
+		$o = new self();
+		$a = $o->ocoll->find([], ['sort' => ['ts' => -1], 'limit' => 50])->toArray();
+
+
+
+		foreach($a as $r) {
+			$d = date( 'h:i A D m/d' , $r['ts']);
+			echo $d . ': ' . $r['m'] . "\n";
+		}
+
+		if (!$a) echo 'no data';
     }
 }
 
 function ueo($msg, $type = false) { upemail_output::out($msg, $type); }
 
-if (!iscli()) upemail_output::accessCheck();
+if (!iscli()) upemail_output::doit();
