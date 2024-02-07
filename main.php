@@ -14,6 +14,7 @@ require_once(__DIR__ . '/../../../21/10/chm/nist/passfail.php'); // https://gith
 
 new sysStatus();
 
+#[\AllowDynamicProperties]
 class sysStatus {
 
     const cpud         =   1;

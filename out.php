@@ -7,6 +7,7 @@ require_once('dao.php');
 class upemail_output extends dao_generic {
     
     const db = dao_sysstatus::db;
+	private readonly object $ocoll;
     
     public static function out($msg, $type = false) {
 	if (!iscli()) return;
