@@ -18,6 +18,7 @@ new sysStatus();
 class sysStatus {
 
     const cpud         =   1;
+	public readonly string $embody; // public is kludging kwifs again
 
 public function __construct() {
 
@@ -88,7 +89,7 @@ private function email() {
 	if (isset($this->emAllPass))   return;
 	if (isset($this->noemailcond)) return;
 	
-	$body = 'exception';
+	$body = 'msgBodyException';
 	$bck = kwifs($this, 'embody');
 	if ($bck && is_string($bck)) $body = $bck;
 	
